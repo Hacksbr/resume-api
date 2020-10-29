@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     # my apps
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -107,3 +108,8 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'medicar', 'media')
 MEDIA_URL = '/media/'
+
+
+# Replace auth user model
+
+AUTH_USER_MODEL = 'users.User'
