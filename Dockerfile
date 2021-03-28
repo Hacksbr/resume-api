@@ -22,7 +22,7 @@ ENV DJANGO_ENV=${DJANGO_ENV} \
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         # deps for installing poetry
-        curl \
+        curl git mercurial \
         # deps for building python deps
         build-essential \
         # cleaning cache
