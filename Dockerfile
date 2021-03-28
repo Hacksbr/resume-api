@@ -1,4 +1,4 @@
-FROM python:3.8.6-slim-buster
+FROM python:3.9.2-slim-buster
 
 ARG DJANGO_ENV
 
@@ -12,7 +12,7 @@ ENV DJANGO_ENV=${DJANGO_ENV} \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
     # poetry
-    POETRY_VERSION=1.1.4 \
+    POETRY_VERSION=1.1.5 \
     POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=false \
     POETRY_CACHE_DIR='/var/cache/pypoetry' \
