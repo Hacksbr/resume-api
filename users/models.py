@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.contrib.auth.models import send_mail
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
@@ -42,9 +41,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def get_short_name(self):
         return self.first_name
-
-    def email_user(self, subject, message, from_email=None):
-        send_mail(subject, message, from_email, [self.email])
 
     class Meta:
         verbose_name = _('user')
