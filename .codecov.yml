@@ -29,3 +29,4 @@ ignore:
   - "**/asgi.py"
   - "**/wsgi.py"
   - "**/apps.py"
+  - "**/admin.py"
