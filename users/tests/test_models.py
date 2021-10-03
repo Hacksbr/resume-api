@@ -1,10 +1,12 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
+from users.tests.fixture import UserFactory
+
 
 class UsersManagersTests(TestCase):
 
-    def test_create_user(self):
+    def test_create_user(self) -> None:
         User = get_user_model()
         user = User.objects.create_user(email='normal@user.com', password='foo')
         self.assertEqual(user.email, 'normal@user.com')
@@ -26,7 +28,7 @@ class UsersManagersTests(TestCase):
         with self.assertRaises(ValueError):
             User.objects.create_user(email='', password="foo")
 
-    def test_create_superuser(self):
+    def test_create_superuser(self) -> None:
         User = get_user_model()
         admin_user = User.objects.create_superuser('super@user.com', 'foo')
         self.assertEqual(admin_user.email, 'super@user.com')
@@ -41,3 +43,8 @@ class UsersManagersTests(TestCase):
 
         with self.assertRaises(ValueError):
             User.objects.create_superuser(email='super@user.com', password='foo', is_superuser=False)
+
+    def test_user_attr(self) -> None:
+        user = UserFactory.create(first_name='Bruce', last_name='Wayne')
+        self.assertEqual(f'{user.first_name} {user.last_name}', user.get_full_name)
+        self.assertEqual(user.first_name, user.get_short_name)
