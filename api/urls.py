@@ -6,10 +6,12 @@ from django.conf.urls.static import static
 from rest_framework import routers
 from rest_framework_simplejwt import views as jwt_views
 
+from profiles.viewsets import ProfileViewSet
 from users.viewsets import UserViewSet
 
 router = routers.DefaultRouter()
 router.register('signup', UserViewSet)
+router.register('profile', ProfileViewSet)
 
 
 urlpatterns = [
