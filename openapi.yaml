@@ -1,0 +1,194 @@
+openapi: 3.0.3
+info:
+  title: Resume
+  description: API for curriculum management.
+  version: 1.0.0
+servers:
+  - url: 'http://127.0.0.1:8000'
+tags:
+  - name: user
+    description: Endpoint for create user.
+  - name: authentication
+    description: Endpoint for authentication.
+  - name: Profile
+    description: Endpoint for authentication.
+paths:
+  /signup/:
+    post:
+      tags:
+        - user
+      description: Signup.
+      operationId: signup
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Login'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: false
+      requestBody:
+        $ref: '#/components/requestBodies/AccessData'
+  /login/:
+    post:
+      tags:
+        - authentication
+      description: Login.
+      operationId: login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Login'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: false
+      requestBody:
+        $ref: '#/components/requestBodies/AccessData'
+  /token/refresh/:
+    post:
+      tags:
+        - authentication
+      description: Update access token.
+      operationId: tokenRefresh
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenRefresh'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: false
+      requestBody:
+        $ref: '#/components/requestBodies/TokenRefresh'
+  /profile/{profileSlug}:
+    get:
+      tags:
+        - Profile
+      description: List a specific profile.
+      operationId: getProfileDetailBySlug
+      parameters:
+        - name: profileSlug
+          in: path
+          description: Slug of profile to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profile'
+        '404':
+          description: Not Found
+components:
+  schemas:
+    Login:
+      type: object
+      properties:
+        refresh:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IjEiLCJpYXQiOjF9.uql_1EDEK4ZUzltJ4cRLAGfjrhrmDwsbQtORY8UX0JY
+        access:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwIiwibmFtZSI6IjAiLCJpYXQiOjB9.uQ8GeRjJTwU5RTPlogcE_DJqDaC9HULIndL45619sTw
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwIiwibmFtZSI6IjAiLCJpYXQiOjB9.uQ8GeRjJTwU5RTPlogcE_DJqDaC9HULIndL45619sTw
+    Profile:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        occupation:
+          type: string
+          example: Software Engineer
+        contact_email:
+          type: string
+          example: email@email.com
+        location:
+          type: string
+          example: Sao Paulo, Brazil
+        phone:
+          type: string
+          example: '+55900000000'
+        social_link:
+          $ref: '#/components/schemas/SocialLink'
+    SocialLink:
+      type: object
+      properties:
+        github:
+          type: string
+          example: https://github.com/user
+        linkedin:
+          type: string
+          example: https://www.linkedin.com/in/user/
+        twitter:
+          type: string
+          example: https://twitter.com/user
+        website:
+          type: string
+          example: https://example.com/
+  requestBodies:
+    AccessData:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: email@email.com.br
+              password:
+                type: string
+                example: password
+      description: Access data.
+      required: true
+    TokenRefresh:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              refresh:
+                type: string
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IjEiLCJpYXQiOjF9.uql_1EDEK4ZUzltJ4cRLAGfjrhrmDwsbQtORY8UX0JY
+      description: Updated access token.
+      required: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
