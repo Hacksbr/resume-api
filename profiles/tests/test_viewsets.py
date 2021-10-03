@@ -11,10 +11,10 @@ User = get_user_model()
 
 class ProfileViewSetTests(APITestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.client = APIClient()
 
-    def test_retrieve(self):
+    def test_retrieve(self) -> None:
         profile = ProfileFactory.create()
 
         response = self.client.get(reverse('profile-detail', args=[profile.uuid]))
