@@ -10,8 +10,8 @@ tags:
     description: Endpoint for create user.
   - name: authentication
     description: Endpoint for authentication.
-  - name: Profile
-    description: Endpoint for authentication.
+  - name: profile
+    description: User profile endpoint.
 paths:
   /signup/:
     post:
@@ -85,16 +85,35 @@ paths:
                 example: false
       requestBody:
         $ref: '#/components/requestBodies/TokenRefresh'
-  /profile/{profileSlug}:
+  /profile/:
+    post:
+      tags:
+        - profile
+      description: Create a new profile user.
+      operationId: createProfile
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profile'
+        '400':
+          description: Bad Request
+      requestBody:
+        $ref: '#/components/requestBodies/Profile'
+  /profile/{uuid}:
     get:
       tags:
-        - Profile
+        - profile
       description: List a specific profile.
-      operationId: getProfileDetailBySlug
+      operationId: getProfileDetailByUUID
       parameters:
-        - name: profileSlug
+        - name: uuid
           in: path
-          description: Slug of profile to return
+          description: UUID of profile to return.
           required: true
           schema:
             type: string
@@ -104,9 +123,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Profile'
+                $ref: '#/components/schemas/Profile'
         '404':
           description: Not Found
 components:
@@ -126,6 +143,18 @@ components:
         access:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwIiwibmFtZSI6IjAiLCJpYXQiOjB9.uQ8GeRjJTwU5RTPlogcE_DJqDaC9HULIndL45619sTw
+    User:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: password
     Profile:
       type: object
       properties:
@@ -154,13 +183,13 @@ components:
           example: https://github.com/user
         linkedin:
           type: string
-          example: https://www.linkedin.com/in/user/
+          example: https://www.linkedin.com/in/user
         twitter:
           type: string
           example: https://twitter.com/user
         website:
           type: string
-          example: https://example.com/
+          example: https://example.com
   requestBodies:
     AccessData:
       content:
@@ -186,6 +215,33 @@ components:
                 type: string
                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IjEiLCJpYXQiOjF9.uql_1EDEK4ZUzltJ4cRLAGfjrhrmDwsbQtORY8UX0JY
       description: Updated access token.
+      required: true
+    Profile:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              user:
+                $ref: '#/components/schemas/User'
+              occupation:
+                type: string
+                example: Software Engineer
+              contact_email:
+                type: string
+                example: email@email.com
+              phone:
+                type: string
+                example: '+55900000000'
+              city:
+                type: string
+                example: Sao Paulo
+              country:
+                type: string
+                example: Brazil
+              social_link:
+                $ref: '#/components/schemas/SocialLink'
+      description: Updated a user profile.
       required: true
   securitySchemes:
     bearerAuth:

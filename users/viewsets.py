@@ -14,7 +14,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = []
 
     def create(self, request, *args, **kwargs):
-        super(UserViewSet, self).create(request, *args, **kwargs)
+        super().create(request, *args, **kwargs)
         return Response({}, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):

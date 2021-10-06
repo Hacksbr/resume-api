@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from .managers import UserManager
+from users.managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
