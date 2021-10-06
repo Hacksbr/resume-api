@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 from profiles.tests.fixture import ProfileFactory
+from users.tests.fixture import UserFactory
 
 User = get_user_model()
 
@@ -26,6 +27,12 @@ SOCIAL_LINK_DATA = dict(
 class ProfileViewSetTests(APITestCase):
 
     def setUp(self) -> None:
+        self.user = UserFactory.create()
+
+        self.admin_user = UserFactory.create()
+        self.admin_user.is_staff = True
+        self.admin_user.is_superuser = True
+
         self.client = APIClient()
 
         self.data = {
@@ -59,7 +66,7 @@ class ProfileViewSetTests(APITestCase):
     def test_retrieve(self) -> None:
         profile = ProfileFactory.create()
 
-        response = self.client.get(reverse('profile-detail', args=[profile.uuid]))
+        response = self.client.get(reverse('profile-detail', args=[profile.uuid]), format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(str(profile.uuid), response.data.get('uuid'))
@@ -72,3 +79,72 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(profile.social_link.linkedin, response.data.get('social_link', {}).get('linkedin'))
         self.assertEqual(profile.social_link.twitter, response.data.get('social_link', {}).get('twitter'))
         self.assertEqual(profile.social_link.website, response.data.get('social_link', {}).get('website'))
+
+    def test_update(self):
+        user = UserFactory.create()
+        profile = ProfileFactory.create(user=user)
+
+        data = {
+            'user': {
+                'first_name': 'Batman',
+                'last_name': 'Wayne',
+            },
+            'occupation': 'Dark Night',
+            'contact_email': 'batman@batman.we',
+            'phone': '+5516998760099',
+            'city': 'Gotham',
+            'country': 'DC Comics',
+            'social_link': {
+                'github': 'https://github.com/batman',
+                'linkedin': 'https://www.linkedin.com/in/batman',
+                'twitter': 'https://twitter.com/batman',
+                'website': 'https://batman.bat/',
+            },
+        }
+
+        self.assertNotEqual(data.get('occupation'), profile.occupation)
+        self.assertNotEqual(data.get('contact_email'), profile.contact_email)
+
+        self.client.force_authenticate(self.user)
+
+        response = self.client.put(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_authenticate(user)
+        response = self.client.put(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data['occupation'] = 'Developer'
+
+        self.client.force_authenticate(self.admin_user)
+        response = self.client.put(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data.get('occupation'), response.data.get('occupation'))
+
+    def test_partial_update(self):
+        user = UserFactory.create()
+        profile = ProfileFactory.create(user=user)
+
+        data = {
+            'occupation': 'Dark Night',
+            'contact_email': 'batman@batman.we',
+            'phone': '+5516998760099',
+            'city': 'Gotham',
+            'country': 'DC Comics',
+        }
+
+        self.assertNotEqual(data.get('occupation'), profile.occupation)
+        self.assertNotEqual(data.get('contact_email'), profile.contact_email)
+
+        self.client.force_authenticate(self.user)
+
+        response = self.client.patch(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_authenticate(user)
+        response = self.client.patch(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.client.force_authenticate(self.admin_user)
+        response = self.client.patch(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
