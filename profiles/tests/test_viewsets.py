@@ -63,6 +63,22 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(social_link_data.get('twitter'), social_link.get('twitter'))
         self.assertEqual(social_link_data.get('website'), social_link.get('website'))
 
+    def test_list(self):
+        ProfileFactory.create_batch(5)
+
+        self.client.logout()
+        response = self.client.get(reverse('profile-list'), format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.client.force_authenticate(self.user)
+        response = self.client.get(reverse('profile-list'), format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.force_authenticate(self.admin_user)
+        response = self.client.get(reverse('profile-list'), format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(response.data), 5)
+
     def test_retrieve(self) -> None:
         profile = ProfileFactory.create()
 
