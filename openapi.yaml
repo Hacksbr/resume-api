@@ -104,6 +104,40 @@ paths:
           description: Bad Request
       requestBody:
         $ref: '#/components/requestBodies/Profile'
+    get:
+      tags:
+        - profile
+      description: List all profiles.
+      operationId: getProfile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profile'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: Authentication credentials were not provided.
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: You do not have permission to perform this action.
+      security:
+        - bearerAuth: ["admin"]
   /profile/{uuid}:
     get:
       tags:
