@@ -47,6 +47,12 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return serializers.ProfileSerializer
 
     def get_permissions(self):
+        if self.action in ['list']:
+            self.permission_classes = (
+                permissions.IsAuthenticated,
+                permissions.IsAdminUser
+            )
+
         if self.action in ['update', 'partial_update']:
             self.permission_classes = (
                 permissions.IsAuthenticated,
