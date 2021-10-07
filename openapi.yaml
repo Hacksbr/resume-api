@@ -118,6 +118,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Profile'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: Authentication credentials were not provided.
         '403':
           description: Forbidden
           content:
