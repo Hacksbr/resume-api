@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, UserUpdateSerializer
 from profiles.models import Profile, SocialLink
 
 User = get_user_model()
+
+
+def update_attr(instance, data, attributes):
+    [setattr(instance, attr, data.get(attr, getattr(instance, attr))) for attr in attributes]
 
 
 class SocialLinkSerializer(serializers.ModelSerializer):
@@ -71,3 +75,42 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
 
         profile = Profile.objects.create(user=user, social_link=social_link, **validated_data)
         return profile
+
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    user = UserUpdateSerializer()
+    social_link = SocialLinkSerializer()
+
+    class Meta:
+        model = Profile
+        lookup_field = 'uuid'
+        fields = (
+            'user',
+            'occupation',
+            'contact_email',
+            'phone',
+            'city',
+            'country',
+            'social_link',
+        )
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user')
+        social_link_data = validated_data.pop('social_link')
+
+        user = instance.user
+        social_link = instance.social_link
+
+        attributes = ['occupation', 'contact_email', 'phone', 'city', 'country']
+        update_attr(instance, validated_data, attributes)
+        instance.save()
+
+        attributes = ['first_name', 'last_name']
+        update_attr(user, user_data, attributes)
+        user.save()
+
+        attributes = ['github', 'linkedin', 'twitter', 'website']
+        update_attr(social_link, social_link_data, attributes)
+        social_link.save()
+
+        return instance

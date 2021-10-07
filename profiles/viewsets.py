@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 
 from profiles.models import Profile
-from profiles.serializers import ProfileSerializer, ProfileCreateSerializer
+from profiles.permissions import IsUserProfileOrAdmin
+from profiles import serializers
 
 User = get_user_model()
 
@@ -21,14 +22,35 @@ class ProfileViewSet(viewsets.ModelViewSet):
         instance = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
-        instance_serializer = ProfileSerializer(instance)
+        instance_serializer = serializers.ProfileSerializer(instance)
         return Response(instance_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        if not request.data.get('user'):
+            return Response(dict(error='Attribute \'user\' is missing.'), status=status.HTTP_400_BAD_REQUEST)
+
+        if not request.data.get('social_link'):
+            return Response(dict(error='Attribute \'social_link\' is missing.'), status=status.HTTP_400_BAD_REQUEST)
+
+        return super().update(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         return serializer.save()
 
     def get_serializer_class(self):
-        if self.action in ['create']:
-            return ProfileCreateSerializer
+        if self.action == 'create':
+            return serializers.ProfileCreateSerializer
 
-        return ProfileSerializer
+        if self.action in ['update', 'partial_update']:
+            return serializers.ProfileUpdateSerializer
+
+        return serializers.ProfileSerializer
+
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update']:
+            self.permission_classes = (
+                permissions.IsAuthenticated,
+                IsUserProfileOrAdmin
+            )
+
+        return super().get_permissions()
