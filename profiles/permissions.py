@@ -16,7 +16,4 @@ class IsUserProfileOrAdmin(permissions.BasePermission):
             if request.user.is_superuser:
                 return True
 
-            if request.user.is_staff:
-                return True
-
         return False
