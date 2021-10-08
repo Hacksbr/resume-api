@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
+from profiles.models import SocialLink
 from profiles.tests.fixture import ProfileFactory
 from users.tests.fixture import UserFactory
 
@@ -68,22 +69,22 @@ class ProfileViewSetTests(APITestCase):
 
         self.client.logout()
         response = self.client.get(reverse('profile-list'), format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
 
         self.client.force_authenticate(self.user)
         response = self.client.get(reverse('profile-list'), format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
         self.client.force_authenticate(self.admin_user)
         response = self.client.get(reverse('profile-list'), format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(response.data), 5)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertTrue(5, len(response.data))
 
     def test_retrieve(self) -> None:
         profile = ProfileFactory.create()
 
         response = self.client.get(reverse('profile-detail', args=[profile.uuid]), format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         self.assertEqual(str(profile.uuid), response.data.get('uuid'))
         self.assertEqual(profile.user.get_full_name, response.data.get('name'))
@@ -124,17 +125,17 @@ class ProfileViewSetTests(APITestCase):
         self.client.force_authenticate(self.user)
 
         response = self.client.put(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
         self.client.force_authenticate(user)
         response = self.client.put(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         data['occupation'] = 'Developer'
 
         self.client.force_authenticate(self.admin_user)
         response = self.client.put(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(data.get('occupation'), response.data.get('occupation'))
 
     def test_partial_update(self):
@@ -153,14 +154,50 @@ class ProfileViewSetTests(APITestCase):
         self.assertNotEqual(data.get('contact_email'), profile.contact_email)
 
         self.client.force_authenticate(self.user)
-
         response = self.client.patch(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
 
         self.client.force_authenticate(user)
         response = self.client.patch(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual('Attribute \'user\' is missing.', response.data.get('error'))
 
         self.client.force_authenticate(self.admin_user)
         response = self.client.patch(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual('Attribute \'user\' is missing.', response.data.get('error'))
+
+        data['user'] = USER_DATA,
+
+        response = self.client.patch(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual('Attribute \'social_link\' is missing.', response.data.get('error'))
+
+    def test_destroy(self):
+        profile = ProfileFactory.create()
+
+        user_id = profile.user_id
+        social_link_id = profile.social_link_id
+
+        self.assertTrue(User.objects.filter(id=user_id).exists())
+        self.assertTrue(SocialLink.objects.filter(id=social_link_id).exists())
+
+        self.client.force_authenticate(self.admin_user)
+        response = self.client.get(reverse('profile-detail', args=[profile.uuid]), format='json')
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertTrue(len(response.data.get('uuid')), profile.uuid)
+
+        self.client.logout()
+        response = self.client.delete(reverse('profile-detail', args=[profile.uuid]), format='json')
+        self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
+
+        self.client.force_authenticate(profile.user)
+        response = self.client.delete(reverse('profile-detail', args=[profile.uuid]), format='json')
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
+        self.assertFalse(User.objects.filter(id=user_id).exists())
+        self.assertFalse(SocialLink.objects.filter(id=social_link_id).exists())
+
+        self.client.force_authenticate(self.admin_user)
+        response = self.client.get(reverse('profile-detail', args=[profile.uuid]), format='json')
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
