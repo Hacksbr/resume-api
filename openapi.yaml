@@ -160,6 +160,13 @@ paths:
                 $ref: '#/components/schemas/Profile'
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
     put:
       tags:
         - profile
@@ -183,8 +190,57 @@ paths:
                   $ref: '#/components/schemas/Profile'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: Authentication credentials were not provided.
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - profile
+      description: Completely delete a user profile.
+      operationId: deleteProfileByUUID
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of profile to return.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: Authentication credentials were not provided.
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
       security:
         - bearerAuth: []
 components:
