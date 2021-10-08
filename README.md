@@ -10,11 +10,11 @@
 </p>
 
 <p align="center">
-  <img alt="Resume API CI" src="https://github.com/Hacksbr/resume/actions/workflows/docker-image.yml/badge.svg" />
-  <img alt="codecov" src="https://codecov.io/gh/Hacksbr/resume/branch/develop/graph/badge.svg?token=3J3N9U72J6" />
-  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Hacksbr/resume?style=plastic" />
-  <img alt="GitHub issues" src="https://img.shields.io/github/issues/Hacksbr/resume?style=plastic" />
-  <img alt="License" src="https://img.shields.io/github/license/Hacksbr/resume?style=plastic" />
+  <img alt="Resume API CI" src="https://github.com/Hacksbr/resume-api/actions/workflows/docker-image.yml/badge.svg" />
+  <img alt="codecov" src="https://codecov.io/gh/Hacksbr/resume-api/branch/develop/graph/badge.svg?token=3J3N9U72J6" />
+  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Hacksbr/resume-api?style=plastic" />
+  <img alt="GitHub issues" src="https://img.shields.io/github/issues/Hacksbr/resume-api?style=plastic" />
+  <img alt="License" src="https://img.shields.io/github/license/Hacksbr/resume-api?style=plastic" />
 </p>
 
 ## About the Project
@@ -24,7 +24,7 @@ Resume API is a project to create and manage data from a curriculum, which repor
 
 ## Roadmap
 
-See the [open issues](https://github.com/Hacksbr/resume/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/Hacksbr/resume-api/issues) for a list of proposed features (and known issues).
 
 
 ## How to contribute
