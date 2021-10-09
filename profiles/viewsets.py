@@ -25,6 +25,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
         instance_serializer = serializers.ProfileSerializer(instance)
         return Response(instance_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    def perform_create(self, serializer):
+        return serializer.save()
+
     def update(self, request, *args, **kwargs):
         if not request.data.get('user'):
             return Response(dict(error='Attribute \'user\' is missing.'), status=status.HTTP_400_BAD_REQUEST)
@@ -34,8 +37,17 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
         return super().update(request, *args, **kwargs)
 
-    def perform_create(self, serializer):
-        return serializer.save()
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = instance.user
+
+        social_link = instance.social_link
+        social_link.delete()
+
+        self.perform_destroy(instance)
+
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -53,7 +65,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 permissions.IsAdminUser
             )
 
-        if self.action in ['update', 'partial_update']:
+        if self.action in ['update', 'partial_update', 'destroy']:
             self.permission_classes = (
                 permissions.IsAuthenticated,
                 IsUserProfileOrAdmin
