@@ -12,3 +12,15 @@ test:
 
 down:
 	@docker-compose down -v
+
+makemigrations:
+	@poetry run ./manage.py makemigrations
+
+migrate:
+	@poetry run ./manage.py migrate
+
+createsuperuser:
+	@poetry run ./manage.py createsuperuser
+
+local-test:
+	@poetry run pytest
