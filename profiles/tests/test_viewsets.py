@@ -28,6 +28,9 @@ SOCIAL_LINK_DATA = dict(
 class ProfileViewSetTests(APITestCase):
 
     def setUp(self) -> None:
+        """
+        Initial setup to run the tests.
+        """
         self.user = UserFactory.create()
 
         self.admin_user = UserFactory.create()
@@ -46,7 +49,10 @@ class ProfileViewSetTests(APITestCase):
             'social_link': SOCIAL_LINK_DATA,
         }
 
-    def test_perform_create(self):
+    def test_perform_create(self) -> None:
+        """
+        Validate the creation of a complete profile with social link.
+        """
         response = self.client.post(reverse('profile-list'), data=self.data, format='json')
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
@@ -64,7 +70,10 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(social_link_data.get('twitter'), social_link.get('twitter'))
         self.assertEqual(social_link_data.get('website'), social_link.get('website'))
 
-    def test_list(self):
+    def test_list(self) -> None:
+        """
+        Validate the listing of created profiles.
+        """
         ProfileFactory.create_batch(5)
 
         self.client.logout()
@@ -81,6 +90,9 @@ class ProfileViewSetTests(APITestCase):
         self.assertTrue(5, len(response.data))
 
     def test_retrieve(self) -> None:
+        """
+        Validate the return of a specific profile through its identifier.
+        """
         profile = ProfileFactory.create()
 
         response = self.client.get(reverse('profile-detail', args=[profile.uuid]), format='json')
@@ -97,7 +109,10 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(profile.social_link.twitter, response.data.get('social_link', {}).get('twitter'))
         self.assertEqual(profile.social_link.website, response.data.get('social_link', {}).get('website'))
 
-    def test_update(self):
+    def test_update(self) -> None:
+        """
+        Validate partial data update of an authenticated profile.
+        """
         user = UserFactory.create()
         profile = ProfileFactory.create(user=user)
 
@@ -138,7 +153,10 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(data.get('occupation'), response.data.get('occupation'))
 
-    def test_partial_update(self):
+    def test_partial_update(self) -> None:
+        """
+        Validate the partial update of a profile's data.
+        """
         user = UserFactory.create()
         profile = ProfileFactory.create(user=user)
 
@@ -173,7 +191,10 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertEqual('Attribute \'social_link\' is missing.', response.data.get('error'))
 
-    def test_destroy(self):
+    def test_destroy(self) -> None:
+        """
+        Validate the deletion of data from an authenticated profile.
+        """
         profile = ProfileFactory.create()
 
         user_id = profile.user_id

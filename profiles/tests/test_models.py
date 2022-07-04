@@ -16,12 +16,18 @@ SOCIAL_LINK_DATA = dict(
 class ProfilesModelTestCase(TestCase):
 
     def setUp(self) -> None:
+        """
+        Initial setup to create a user and run the tests.
+        """
         self.user = User.objects.create_user(
             first_name='Bruce', last_name='Wayne',
             email='batman@batman.com', password='imbatman'
         )
 
     def test_create_profile(self) -> None:
+        """
+        Validate that a profile is being created correctly.
+        """
         profile = Profile.objects.create(
             occupation='Software Developer',
             contact_email='bruce@wayne.com',
@@ -40,6 +46,9 @@ class ProfilesModelTestCase(TestCase):
         self.assertEqual(profile.get_location, 'Gothan, DC Comics')
 
     def test_create_profile_social_link(self) -> None:
+        """
+        Validate if a profile is being created with a social link.
+        """
         social_link = SocialLink.objects.create(**SOCIAL_LINK_DATA)
         profile = Profile.objects.create(
             occupation='Back-end Developer',
@@ -63,6 +72,9 @@ class ProfilesModelTestCase(TestCase):
 class SocialLinkModelTestCase(TestCase):
 
     def test_create_social_link(self):
+        """
+        Validate the creation of a social link.
+        """
         social_link = SocialLink.objects.create(**SOCIAL_LINK_DATA)
         self.assertEqual(SOCIAL_LINK_DATA.get('github'), social_link.github)
         self.assertEqual(SOCIAL_LINK_DATA.get('linkedin'), social_link.linkedin)
@@ -73,6 +85,9 @@ class SocialLinkModelTestCase(TestCase):
         self.assertEqual('bruce', social_link.get_twitter_user)
 
     def test_social_link_attr(self):
+        """
+        Validate the creation of the attributes of a social link.
+        """
         social_link = SocialLink.objects.create(website=SOCIAL_LINK_DATA.get('website'))
         self.assertEqual(SOCIAL_LINK_DATA.get('website'), str(social_link))
         social_link = SocialLink.objects.create(twitter=SOCIAL_LINK_DATA.get('twitter'))
