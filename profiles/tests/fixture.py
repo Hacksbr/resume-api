@@ -1,5 +1,12 @@
 import factory
+from faker import Faker
+
 from profiles.models import Profile, SocialLink
+
+
+def _get_link():
+    fake = Faker(['pt_BR'])
+    return f'{fake.url()}{fake.user_name()}'
 
 
 class SocialLinkFactory(factory.django.DjangoModelFactory):
@@ -7,10 +14,9 @@ class SocialLinkFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = SocialLink
 
-    github = factory.Faker('url')
-    linkedin = factory.Faker('url')
-    twitter = factory.Faker('url')
-    website = factory.Faker('url')
+    profile = factory.SubFactory('profiles.tests.fixture.ProfileFactory')
+    name = factory.Faker('random_element', elements=('github', 'linkedin', 'twitter', 'website', 'other'))
+    link = _get_link()
 
 
 class ProfileFactory(factory.django.DjangoModelFactory):
@@ -24,4 +30,3 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     phone = '+5516900000000'
     city = factory.Faker('city')
     country = factory.Faker('country')
-    social_link = factory.SubFactory('profiles.tests.fixture.SocialLinkFactory')
