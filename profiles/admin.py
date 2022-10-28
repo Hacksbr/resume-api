@@ -28,7 +28,16 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(SocialLink)
 class SocialLinkAdmin(admin.ModelAdmin):
-    list_display = ('id', 'github', 'linkedin', 'twitter', 'website')
-    list_display_links = ('id', 'github', 'linkedin', 'twitter', 'website')
-    list_filter = ('github', 'linkedin', 'twitter', 'website')
-    search_fields = ('github', 'linkedin', 'twitter', 'website')
+    list_display = ('id', 'name', 'link', 'is_active', 'profile__user__name')
+    list_display_links = ('id', 'name', 'link', 'is_active', 'profile__user__name')
+    list_filter = ('name', 'link', 'is_active')
+    search_fields = ('name', 'link', 'is_active', 'profile__user__name')
+
+    def profile__user__name(self, obj):
+        if obj.profile.user:
+            return obj.profile.user.get_full_name
+
+        return 'None'
+
+    profile__user__name.short_description = 'User\'s Name'
+    profile__user__name.admin_order_field = 'profile__user__name'
