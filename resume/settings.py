@@ -7,7 +7,7 @@ from unipath import Path
 from dj_database_url import parse as db_url
 
 
-BASE_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='ARANDOMSECRETKEY')
 
@@ -28,8 +28,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_extensions',
     # my apps
-    'users',
-    'profiles'
+    'resume.users',
+    'resume.profiles'
 ]
 
 MIDDLEWARE = [
@@ -43,7 +43,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'api.urls'
+ROOT_URLCONF = 'resume.urls'
 
 TEMPLATES = [
     {
@@ -61,7 +61,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'api.wsgi.application'
+WSGI_APPLICATION = 'resume.wsgi.application'
 
 # Database
 DATABASES = {

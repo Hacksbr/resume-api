@@ -1,9 +1,9 @@
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase, RequestFactory
 
-from profiles.admin import ProfileAdmin, SocialLinkAdmin
-from profiles.models import Profile, SocialLink
-from profiles.tests.fixture import ProfileFactory, SocialLinkFactory
+from resume.profiles.admin import ProfileAdmin, SocialLinkAdmin
+from resume.profiles.models import Profile, SocialLink
+from resume.profiles.tests.fixture import ProfileFactory, SocialLinkFactory
 
 
 class MockUser:

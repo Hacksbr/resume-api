@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from profiles.models import Profile, SocialLink
+from resume.profiles.models import Profile, SocialLink
 
 
 @admin.register(Profile)

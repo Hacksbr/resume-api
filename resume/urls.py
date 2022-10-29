@@ -6,8 +6,8 @@ from django.conf.urls.static import static
 from rest_framework import routers
 from rest_framework_simplejwt import views as jwt_views
 
-from profiles.viewsets import ProfileViewSet
-from users.viewsets import UserViewSet
+from resume.profiles.viewsets import ProfileViewSet
+from resume.users.viewsets import UserViewSet
 
 router = routers.DefaultRouter()
 router.register('signup', UserViewSet)
@@ -21,7 +21,7 @@ urlpatterns = [
     path('login/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
 
-    path('api-auth/', include('rest_framework.urls')),
+    path('resume-auth/', include('rest_framework.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
