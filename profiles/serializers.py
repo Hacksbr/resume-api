@@ -16,11 +16,23 @@ class SocialLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = SocialLink
         fields = (
+            'name',
+            'link',
+            'is_active',
+        )
+
+
+class SocialLinkUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SocialLink
+        fields = (
             'id',
             'name',
             'link',
             'is_active',
         )
+        extra_kwargs = {'id': {'read_only': False, 'required': False}}
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -83,7 +95,7 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     user = UserUpdateSerializer()
-    social_links = SocialLinkSerializer(many=True)
+    social_links = SocialLinkUpdateSerializer(many=True)
 
     class Meta:
         model = Profile
@@ -114,15 +126,20 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
         social_link_objs = []
         for item in social_links_data:
-            social_link = SocialLink.objects.filter(pk=item.get('id'))
+            social_link, created = SocialLink.objects.get_or_create(
+                id=item.get('id'),
+                profile_id=instance.id,
+                defaults={
+                    'name': item.get('name'),
+                    'link': item.get('link'),
+                    'is_active': item.get('is_active')
+                }
+            )
 
-            if social_link.exists():
-                social_link = social_link.first()
+            if not created:
                 social_link.link = item.get('link')
                 social_link.is_active = item.get('is_active')
                 social_link_objs.append(social_link)
-            else:
-                SocialLink.objects.create(profile=instance, **item)
 
         SocialLink.objects.bulk_update(social_link_objs, ['link', 'is_active'])
 

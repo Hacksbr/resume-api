@@ -26,8 +26,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return Response(instance_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
-        instance = serializer.save()
-        return instance
+        return serializer.save()
 
     def update(self, request, *args, **kwargs):
         if not request.data.get('user'):
