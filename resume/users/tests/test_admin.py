@@ -1,9 +1,9 @@
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase, RequestFactory
 
-from users.admin import UserAdmin
-from users.models import User
-from users.tests.fixture import UserFactory
+from resume.users.admin import UserAdmin
+from resume.users.models import User
+from resume.users.tests.fixture import UserFactory
 
 
 class MockUser:

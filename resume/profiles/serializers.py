@@ -1,10 +1,8 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from users.serializers import UserSerializer, UserUpdateSerializer
-from profiles.models import Profile, SocialLink
-
-User = get_user_model()
+from resume.users.models import User
+from resume.users.serializers import UserSerializer, UserUpdateSerializer
+from resume.profiles.models import Profile, SocialLink
 
 
 def update_attr(instance, data, attributes):

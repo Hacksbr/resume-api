@@ -1,8 +1,8 @@
 from django.test import TestCase
 
-from profiles.models import Profile, SocialLink
-from users.tests.fixture import UserFactory
-from profiles.tests.fixture import ProfileFactory, SocialLinkFactory
+from resume.profiles.models import Profile, SocialLink
+from resume.profiles.tests.fixture import ProfileFactory, SocialLinkFactory
+from resume.users.tests.fixture import UserFactory
 
 
 class ProfilesModelTestCase(TestCase):

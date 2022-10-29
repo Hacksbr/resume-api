@@ -1,13 +1,9 @@
-from django.contrib.auth import get_user_model
-
 from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 
-from profiles.models import Profile
-from profiles.permissions import IsUserProfileOrAdmin
-from profiles import serializers
-
-User = get_user_model()
+from resume.profiles.models import Profile
+from resume.profiles.permissions import IsUserProfileOrAdmin
+from resume.profiles import serializers
 
 
 class ProfileViewSet(viewsets.ModelViewSet):

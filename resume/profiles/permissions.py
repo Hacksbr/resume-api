@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 
-from profiles.models import Profile
+from resume.profiles.models import Profile
 
 
 class IsUserProfileOrAdmin(permissions.BasePermission):

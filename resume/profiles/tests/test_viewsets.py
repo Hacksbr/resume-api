@@ -1,13 +1,11 @@
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-from profiles.tests.fixture import ProfileFactory, SocialLinkFactory
-from users.tests.fixture import UserFactory
-
-User = get_user_model()
+from resume.profiles.tests.fixture import ProfileFactory, SocialLinkFactory
+from resume.users.models import User
+from resume.users.tests.fixture import UserFactory
 
 USER_DATA = dict(
     first_name='Bruce',
