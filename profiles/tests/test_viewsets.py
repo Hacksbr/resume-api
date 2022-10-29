@@ -130,6 +130,12 @@ class ProfileViewSetTests(APITestCase):
                     'name': social_link2.name,
                     'link': 'https://www.linkedin.com/in/batman',
                     'is_active': True,
+                },
+                {
+                    'id': 0,
+                    'name': 'website',
+                    'link': 'https://www.example.com',
+                    'is_active': True,
                 }
             ]
         }

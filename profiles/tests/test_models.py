@@ -59,15 +59,20 @@ class SocialLinkModelTestCase(TestCase):
         """
         social_link = SocialLinkFactory.create(name='website', link='https://wayneenterprises.we/')
         self.assertEqual('', social_link.get_username)
+        self.assertEqual('website', str(social_link))
 
         social_link = SocialLinkFactory.create(name='github', link='https://github.com/batman')
         self.assertEqual('batman', social_link.get_username)
+        self.assertEqual('github', str(social_link))
 
         social_link = SocialLinkFactory.create(name='linkedin', link='https://www.linkedin.com/in/bruce-wayne/')
         self.assertEqual('bruce-wayne', social_link.get_username)
+        self.assertEqual('linkedin', str(social_link))
 
         social_link = SocialLinkFactory.create(name='twitter', link='https://twitter.com/brucew/')
         self.assertEqual('brucew', social_link.get_username)
+        self.assertEqual('twitter', str(social_link))
 
         social_link = SocialLinkFactory.create(name='website', link='https://www.youtube.com/c/EbhDRTEI54E')
         self.assertEqual('', social_link.get_username)
+        self.assertEqual('website', str(social_link))
