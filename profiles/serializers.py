@@ -16,17 +16,29 @@ class SocialLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = SocialLink
         fields = (
-            'github',
-            'linkedin',
-            'twitter',
-            'website',
+            'name',
+            'link',
+            'is_active',
         )
+
+
+class SocialLinkUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SocialLink
+        fields = (
+            'id',
+            'name',
+            'link',
+            'is_active',
+        )
+        extra_kwargs = {'id': {'read_only': False, 'required': False}}
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
-    social_link = SocialLinkSerializer()
+    social_links = SocialLinkSerializer(many=True)
 
     def get_name(self, obj):  # noqa
         return str(obj)
@@ -44,14 +56,14 @@ class ProfileSerializer(serializers.ModelSerializer):
             'contact_email',
             'location',
             'phone',
-            'social_link',
+            'social_links',
         )
         read_only_fields = ('uuid',)
 
 
 class ProfileCreateSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    social_link = SocialLinkSerializer()
+    social_links = SocialLinkSerializer(many=True)
 
     class Meta:
         model = Profile
@@ -63,23 +75,27 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
             'phone',
             'city',
             'country',
-            'social_link',
+            'social_links',
         )
+        read_only_fields = ('social_links',)
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        social_link_data = validated_data.pop('social_link')
+        social_link_data = validated_data.pop('social_links')
 
         user = User.objects.create_user(**user_data)
-        social_link = SocialLink.objects.create(**social_link_data)
+        profile = Profile.objects.create(user=user, **validated_data)
 
-        profile = Profile.objects.create(user=user, social_link=social_link, **validated_data)
+        SocialLink.objects.bulk_create(
+            [SocialLink(profile=profile, **item) for item in social_link_data]
+        )
+
         return profile
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     user = UserUpdateSerializer()
-    social_link = SocialLinkSerializer()
+    social_links = SocialLinkUpdateSerializer(many=True)
 
     class Meta:
         model = Profile
@@ -91,15 +107,14 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             'phone',
             'city',
             'country',
-            'social_link',
+            'social_links',
         )
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user')
-        social_link_data = validated_data.pop('social_link')
+        social_links_data = validated_data.pop('social_links')
 
         user = instance.user
-        social_link = instance.social_link
 
         attributes = ['occupation', 'contact_email', 'phone', 'city', 'country']
         update_attr(instance, validated_data, attributes)
@@ -109,8 +124,23 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         update_attr(user, user_data, attributes)
         user.save()
 
-        attributes = ['github', 'linkedin', 'twitter', 'website']
-        update_attr(social_link, social_link_data, attributes)
-        social_link.save()
+        social_link_objs = []
+        for item in social_links_data:
+            social_link, created = SocialLink.objects.get_or_create(
+                id=item.get('id'),
+                profile_id=instance.id,
+                defaults={
+                    'name': item.get('name'),
+                    'link': item.get('link'),
+                    'is_active': item.get('is_active')
+                }
+            )
+
+            if not created:
+                social_link.link = item.get('link')
+                social_link.is_active = item.get('is_active')
+                social_link_objs.append(social_link)
+
+        SocialLink.objects.bulk_update(social_link_objs, ['link', 'is_active'])
 
         return instance

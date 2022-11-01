@@ -4,8 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-from profiles.models import SocialLink
-from profiles.tests.fixture import ProfileFactory
+from profiles.tests.fixture import ProfileFactory, SocialLinkFactory
 from users.tests.fixture import UserFactory
 
 User = get_user_model()
@@ -17,12 +16,12 @@ USER_DATA = dict(
     password='imbatman'
 )
 
-SOCIAL_LINK_DATA = dict(
-    github='https://github.com/batman',
-    linkedin='https://www.linkedin.com/in/bruce',
-    twitter='https://twitter.com/bruce',
-    website='https://wayneenterprises.we/',
-)
+SOCIAL_LINK_DATA = [
+    dict(name='github', link='https://github.com/batman'),
+    dict(name='linkedin', link='https://www.linkedin.com/in/batman'),
+    dict(name='twitter', link='https://twitter.com/batman'),
+    dict(name='website', link='https://batman.bat/')
+]
 
 
 class ProfileViewSetTests(APITestCase):
@@ -36,6 +35,7 @@ class ProfileViewSetTests(APITestCase):
         self.admin_user = UserFactory.create()
         self.admin_user.is_staff = True
         self.admin_user.is_superuser = True
+        self.admin_user.save()
 
         self.client = APIClient()
 
@@ -46,7 +46,7 @@ class ProfileViewSetTests(APITestCase):
             'phone': '+5516998760099',
             'city': 'Metropolis',
             'country': 'DC Comics',
-            'social_link': SOCIAL_LINK_DATA,
+            'social_links': SOCIAL_LINK_DATA,
         }
 
     def test_perform_create(self) -> None:
@@ -57,18 +57,12 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         user_data = self.data.get('user', {})
-        social_link_data = self.data.get('social_link', {})
-        social_link = response.data.get('social_link', {})
-
         self.assertEqual(f'{user_data.get("first_name")} {user_data.get("last_name")}', response.data.get('name'))
         self.assertEqual(self.data.get('occupation'), response.data.get('occupation'))
         self.assertEqual(self.data.get('contact_email'), response.data.get('contact_email'))
         self.assertEqual(f'{self.data.get("city")}, {self.data.get("country")}', response.data.get('location'))
         self.assertEqual(self.data.get('phone'), response.data.get('phone'))
-        self.assertEqual(social_link_data.get('github'), social_link.get('github'))
-        self.assertEqual(social_link_data.get('linkedin'), social_link.get('linkedin'))
-        self.assertEqual(social_link_data.get('twitter'), social_link.get('twitter'))
-        self.assertEqual(social_link_data.get('website'), social_link.get('website'))
+        self.assertEqual(len(self.data.get('social_links')), len(response.data.get('social_links')))
 
     def test_list(self) -> None:
         """
@@ -104,10 +98,6 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(profile.contact_email, response.data.get('contact_email'))
         self.assertEqual(profile.get_location, response.data.get('location'))
         self.assertEqual(profile.phone, response.data.get('phone'))
-        self.assertEqual(profile.social_link.github, response.data.get('social_link', {}).get('github'))
-        self.assertEqual(profile.social_link.linkedin, response.data.get('social_link', {}).get('linkedin'))
-        self.assertEqual(profile.social_link.twitter, response.data.get('social_link', {}).get('twitter'))
-        self.assertEqual(profile.social_link.website, response.data.get('social_link', {}).get('website'))
 
     def test_update(self) -> None:
         """
@@ -115,6 +105,8 @@ class ProfileViewSetTests(APITestCase):
         """
         user = UserFactory.create()
         profile = ProfileFactory.create(user=user)
+        social_link1 = SocialLinkFactory.create(profile=profile)
+        social_link2 = SocialLinkFactory.create(profile=profile)
 
         data = {
             'user': {
@@ -126,12 +118,26 @@ class ProfileViewSetTests(APITestCase):
             'phone': '+5516998760099',
             'city': 'Gotham',
             'country': 'DC Comics',
-            'social_link': {
-                'github': 'https://github.com/batman',
-                'linkedin': 'https://www.linkedin.com/in/batman',
-                'twitter': 'https://twitter.com/batman',
-                'website': 'https://batman.bat/',
-            },
+            'social_links': [
+                {
+                    'id': social_link1.id,
+                    'name': social_link1.name,
+                    'link': 'https://github.com/batman',
+                    'is_active': True,
+                },
+                {
+                    'id': social_link2.id,
+                    'name': social_link2.name,
+                    'link': 'https://www.linkedin.com/in/batman',
+                    'is_active': True,
+                },
+                {
+                    'id': 0,
+                    'name': 'website',
+                    'link': 'https://www.example.com',
+                    'is_active': True,
+                }
+            ]
         }
 
         self.assertNotEqual(data.get('occupation'), profile.occupation)
@@ -198,10 +204,8 @@ class ProfileViewSetTests(APITestCase):
         profile = ProfileFactory.create()
 
         user_id = profile.user_id
-        social_link_id = profile.social_link_id
 
         self.assertTrue(User.objects.filter(id=user_id).exists())
-        self.assertTrue(SocialLink.objects.filter(id=social_link_id).exists())
 
         self.client.force_authenticate(self.admin_user)
         response = self.client.get(reverse('profile-detail', args=[profile.uuid]), format='json')
@@ -217,7 +221,6 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
         self.assertFalse(User.objects.filter(id=user_id).exists())
-        self.assertFalse(SocialLink.objects.filter(id=social_link_id).exists())
 
         self.client.force_authenticate(self.admin_user)
         response = self.client.get(reverse('profile-detail', args=[profile.uuid]), format='json')

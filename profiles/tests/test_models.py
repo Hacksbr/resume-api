@@ -1,16 +1,8 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from profiles.models import Profile, SocialLink
-
-User = get_user_model()
-
-SOCIAL_LINK_DATA = dict(
-    github='https://github.com/batman',
-    linkedin='https://www.linkedin.com/in/bruce',
-    twitter='https://twitter.com/bruce',
-    website='https://wayneenterprises.we/',
-)
+from users.tests.fixture import UserFactory
+from profiles.tests.fixture import ProfileFactory, SocialLinkFactory
 
 
 class ProfilesModelTestCase(TestCase):
@@ -19,10 +11,7 @@ class ProfilesModelTestCase(TestCase):
         """
         Initial setup to create a user and run the tests.
         """
-        self.user = User.objects.create_user(
-            first_name='Bruce', last_name='Wayne',
-            email='batman@batman.com', password='imbatman'
-        )
+        self.user = UserFactory.create()
 
     def test_create_profile(self) -> None:
         """
@@ -41,58 +30,49 @@ class ProfilesModelTestCase(TestCase):
         self.assertEqual(profile.phone, '+5516991230099')
         self.assertEqual(profile.city, 'Gothan')
         self.assertEqual(profile.country, 'DC Comics')
-        self.assertEqual(profile.user.first_name, 'Bruce')
-        self.assertEqual(str(profile), 'Bruce Wayne')
+        self.assertEqual(profile.user.first_name, self.user.first_name)
+        self.assertEqual(str(profile), self.user.get_full_name)
         self.assertEqual(profile.get_location, 'Gothan, DC Comics')
-
-    def test_create_profile_social_link(self) -> None:
-        """
-        Validate if a profile is being created with a social link.
-        """
-        social_link = SocialLink.objects.create(**SOCIAL_LINK_DATA)
-        profile = Profile.objects.create(
-            occupation='Back-end Developer',
-            contact_email='bruce@wayneenterprises.we',
-            phone='+5516998760099',
-            city='Metropolis',
-            country='DC Comics',
-            user=self.user,
-            social_link=social_link
-        )
-        self.assertEqual(profile.occupation, 'Back-end Developer')
-        self.assertEqual(profile.city, 'Metropolis')
-        self.assertEqual(profile.country, 'DC Comics')
-        self.assertEqual(profile.user.first_name, 'Bruce')
-        self.assertEqual(profile.social_link.github, SOCIAL_LINK_DATA.get('github'))
-        self.assertEqual(profile.social_link.linkedin, SOCIAL_LINK_DATA.get('linkedin'))
-        self.assertEqual(profile.social_link.twitter, SOCIAL_LINK_DATA.get('twitter'))
-        self.assertEqual(profile.social_link.website, SOCIAL_LINK_DATA.get('website'))
 
 
 class SocialLinkModelTestCase(TestCase):
+
+    def setUp(self) -> None:
+        """
+        Initial setup to create a profile and run the tests.
+        """
+        self.profile = ProfileFactory.create()
 
     def test_create_social_link(self):
         """
         Validate the creation of a social link.
         """
-        social_link = SocialLink.objects.create(**SOCIAL_LINK_DATA)
-        self.assertEqual(SOCIAL_LINK_DATA.get('github'), social_link.github)
-        self.assertEqual(SOCIAL_LINK_DATA.get('linkedin'), social_link.linkedin)
-        self.assertEqual(SOCIAL_LINK_DATA.get('twitter'), social_link.twitter)
-        self.assertEqual(SOCIAL_LINK_DATA.get('website'), social_link.website)
-        self.assertEqual('batman', social_link.get_github_user)
-        self.assertEqual('bruce', social_link.get_linkedin_user)
-        self.assertEqual('bruce', social_link.get_twitter_user)
+        data = dict(name='github', link='https://github.com/batman', profile=self.profile)
+        social_link = SocialLink.objects.create(**data)
+        self.assertEqual(data.get('name'), social_link.name)
+        self.assertEqual(data.get('link'), social_link.link)
+        self.assertTrue(social_link.is_active)
 
-    def test_social_link_attr(self):
+    def test_social_link_property(self):
         """
-        Validate the creation of the attributes of a social link.
+        Validate the correct return of social link property.
         """
-        social_link = SocialLink.objects.create(website=SOCIAL_LINK_DATA.get('website'))
-        self.assertEqual(SOCIAL_LINK_DATA.get('website'), str(social_link))
-        social_link = SocialLink.objects.create(twitter=SOCIAL_LINK_DATA.get('twitter'))
-        self.assertEqual('bruce', str(social_link))
-        social_link = SocialLink.objects.create(linkedin=SOCIAL_LINK_DATA.get('linkedin'))
-        self.assertEqual('bruce', str(social_link))
-        social_link = SocialLink.objects.create(github=SOCIAL_LINK_DATA.get('github'))
-        self.assertEqual('batman', str(social_link))
+        social_link = SocialLinkFactory.create(name='website', link='https://wayneenterprises.we/')
+        self.assertEqual('', social_link.get_username)
+        self.assertEqual('website', str(social_link))
+
+        social_link = SocialLinkFactory.create(name='github', link='https://github.com/batman')
+        self.assertEqual('batman', social_link.get_username)
+        self.assertEqual('github', str(social_link))
+
+        social_link = SocialLinkFactory.create(name='linkedin', link='https://www.linkedin.com/in/bruce-wayne/')
+        self.assertEqual('bruce-wayne', social_link.get_username)
+        self.assertEqual('linkedin', str(social_link))
+
+        social_link = SocialLinkFactory.create(name='twitter', link='https://twitter.com/brucew/')
+        self.assertEqual('brucew', social_link.get_username)
+        self.assertEqual('twitter', str(social_link))
+
+        social_link = SocialLinkFactory.create(name='website', link='https://www.youtube.com/c/EbhDRTEI54E')
+        self.assertEqual('', social_link.get_username)
+        self.assertEqual('website', str(social_link))

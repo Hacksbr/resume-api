@@ -32,7 +32,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         if not request.data.get('user'):
             return Response(dict(error='Attribute \'user\' is missing.'), status=status.HTTP_400_BAD_REQUEST)
 
-        if not request.data.get('social_link'):
+        if not request.data.get('social_links'):
             return Response(dict(error='Attribute \'social_link\' is missing.'), status=status.HTTP_400_BAD_REQUEST)
 
         return super().update(request, *args, **kwargs)
@@ -40,9 +40,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         user = instance.user
-
-        social_link = instance.social_link
-        social_link.delete()
 
         self.perform_destroy(instance)
 
