@@ -36,6 +36,7 @@ class Profile(models.Model):
     )
     city = models.CharField(_('City'), max_length=100, blank=False, null=False)
     country = models.CharField(_('Country'), max_length=80, blank=False, null=False)
+    about = models.CharField(_('About'), max_length=550, blank=True, null=True)
 
     created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('Updated at'), auto_now=True)

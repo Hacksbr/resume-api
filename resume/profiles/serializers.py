@@ -54,6 +54,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'contact_email',
             'location',
             'phone',
+            'about',
             'social_links',
         )
         read_only_fields = ('uuid',)
@@ -73,6 +74,7 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
             'phone',
             'city',
             'country',
+            'about',
             'social_links',
         )
         read_only_fields = ('social_links',)
