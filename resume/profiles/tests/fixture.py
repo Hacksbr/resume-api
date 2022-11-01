@@ -10,7 +10,6 @@ def _get_link():
 
 
 class SocialLinkFactory(factory.django.DjangoModelFactory):
-
     class Meta:
         model = SocialLink
 
@@ -20,7 +19,6 @@ class SocialLinkFactory(factory.django.DjangoModelFactory):
 
 
 class ProfileFactory(factory.django.DjangoModelFactory):
-
     class Meta:
         model = Profile
 
@@ -30,3 +28,4 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     phone = '+5516900000000'
     city = factory.Faker('city')
     country = factory.Faker('country')
+    about = factory.Faker('text', max_nb_chars=550)

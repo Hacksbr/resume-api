@@ -7,23 +7,17 @@ from resume.profiles.tests.fixture import ProfileFactory, SocialLinkFactory
 from resume.users.models import User
 from resume.users.tests.fixture import UserFactory
 
-USER_DATA = dict(
-    first_name='Bruce',
-    last_name='Wayne',
-    email='batman@batman.com',
-    password='imbatman'
-)
+USER_DATA = dict(first_name='Bruce', last_name='Wayne', email='batman@batman.com', password='imbatman')
 
 SOCIAL_LINK_DATA = [
     dict(name='github', link='https://github.com/batman'),
     dict(name='linkedin', link='https://www.linkedin.com/in/batman'),
     dict(name='twitter', link='https://twitter.com/batman'),
-    dict(name='website', link='https://batman.bat/')
+    dict(name='website', link='https://batman.bat/'),
 ]
 
 
 class ProfileViewSetTests(APITestCase):
-
     def setUp(self) -> None:
         """
         Initial setup to run the tests.
@@ -134,8 +128,8 @@ class ProfileViewSetTests(APITestCase):
                     'name': 'website',
                     'link': 'https://www.example.com',
                     'is_active': True,
-                }
-            ]
+                },
+            ],
         }
 
         self.assertNotEqual(data.get('occupation'), profile.occupation)
@@ -189,7 +183,7 @@ class ProfileViewSetTests(APITestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertEqual('Attribute \'user\' is missing.', response.data.get('error'))
 
-        data['user'] = USER_DATA,
+        data['user'] = USER_DATA
 
         response = self.client.patch(reverse('profile-detail', args=[profile.uuid]), data=data, format='json')
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
@@ -200,9 +194,7 @@ class ProfileViewSetTests(APITestCase):
         Validate the deletion of data from an authenticated profile.
         """
         profile = ProfileFactory.create()
-
         user_id = profile.user_id
-
         self.assertTrue(User.objects.filter(id=user_id).exists())
 
         self.client.force_authenticate(self.admin_user)
@@ -223,3 +215,19 @@ class ProfileViewSetTests(APITestCase):
         self.client.force_authenticate(self.admin_user)
         response = self.client.get(reverse('profile-detail', args=[profile.uuid]), format='json')
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_create_with_field_about(self) -> None:
+        """
+        Validate the creation of a profile with the 'About' field.
+        """
+        self.data['about'] = 'a' * 550
+        response = self.client.post(reverse('profile-list'), data=self.data, format='json')
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+        self.data['user']['email'] = 'batman+1@batman.com'
+        self.data['about'] = 'a' * 551
+        response = self.client.post(reverse('profile-list'), data=self.data, format='json')
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(
+            'Certifique-se de que este campo não tenha mais de 550 caracteres.', response.data.get('about')[0]
+        )
