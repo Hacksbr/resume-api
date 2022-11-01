@@ -28,9 +28,7 @@ repos:
         require_serial: true
         types: [ python ]
         args:
-          - --check
-          - --line-length=120
-          - --verbose
+          - --config=pyproject.toml
 
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.9.2

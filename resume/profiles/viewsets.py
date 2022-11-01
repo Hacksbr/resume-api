@@ -1,9 +1,11 @@
-from rest_framework import viewsets, status, permissions
+# Pip imports
+from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
+# Internal imports
+from resume.profiles import serializers
 from resume.profiles.models import Profile
 from resume.profiles.permissions import IsUserProfileOrAdmin
-from resume.profiles import serializers
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -53,15 +55,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list']:
-            self.permission_classes = (
-                permissions.IsAuthenticated,
-                permissions.IsAdminUser
-            )
+            self.permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
         if self.action in ['update', 'partial_update', 'destroy']:
-            self.permission_classes = (
-                permissions.IsAuthenticated,
-                IsUserProfileOrAdmin
-            )
+            self.permission_classes = (permissions.IsAuthenticated, IsUserProfileOrAdmin)
 
         return super().get_permissions()

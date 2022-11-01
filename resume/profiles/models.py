@@ -1,8 +1,11 @@
+# Python imports
 import uuid
 
-from django.db import models
+# Pip imports
 from django.core.validators import RegexValidator
+from django.db import models
 from django.utils.translation import gettext_lazy as _
+
 
 SOCIAL_NETWORKS = (
     ('GITHUB', _('GitHub')),
@@ -15,20 +18,21 @@ SOCIAL_NETWORKS = (
 
 class Profile(models.Model):
     user = models.OneToOneField(
-        'users.User', verbose_name='User',
-        related_name='user_profile',
-        on_delete=models.CASCADE
+        'users.User', verbose_name='User', related_name='user_profile', on_delete=models.CASCADE
     )
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     occupation = models.CharField(_('Occupation'), max_length=100, blank=False, null=False)
     contact_email = models.EmailField(_('Contact Email'), max_length=255, blank=True, null=True)
     phone = models.CharField(
-        _('Phone'), max_length=15,
-        validators=[RegexValidator(
-            regex=r'^\+?1?\d{9,15}$',
-            message="Phone number must be entered in the format: '+9999999999999'. Up to 15 digits allowed."
-        )]
+        _('Phone'),
+        max_length=15,
+        validators=[
+            RegexValidator(
+                regex=r'^\+?1?\d{9,15}$',
+                message="Phone number must be entered in the format: '+9999999999999'. Up to 15 digits allowed.",
+            )
+        ],
     )
     city = models.CharField(_('City'), max_length=100, blank=False, null=False)
     country = models.CharField(_('Country'), max_length=80, blank=False, null=False)
@@ -49,7 +53,6 @@ class Profile(models.Model):
 
 
 class SocialLink(models.Model):
-
     class SocialNetworks(models.TextChoices):
         GITHUB = 'github', _('GitHub')
         LINKEDIN = 'linkedin', _('LinkedIn')
@@ -58,9 +61,7 @@ class SocialLink(models.Model):
         OTHER = 'other', _('Other')
 
     profile = models.ForeignKey(
-        'Profile', verbose_name='Profile',
-        related_name='social_links',
-        on_delete=models.CASCADE
+        'Profile', verbose_name='Profile', related_name='social_links', on_delete=models.CASCADE
     )
 
     name = models.CharField(_('Name'), max_length=8, choices=SocialNetworks.choices, blank=False, null=False)

@@ -1,10 +1,11 @@
+# Python imports
 import os
-
 from datetime import timedelta
 
+# Pip imports
 from decouple import config
-from unipath import Path
 from dj_database_url import parse as db_url
+from unipath import Path
 
 
 BASE_DIR = Path(__file__).parent.parent

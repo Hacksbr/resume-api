@@ -1,10 +1,11 @@
+# Pip imports
 from rest_framework import serializers
 
+# Internal imports
 from resume.users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = (
@@ -13,6 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'password',
         )
+
     extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
     def create(self, validated_data):
@@ -20,7 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = (

@@ -1,11 +1,12 @@
+# Pip imports
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 
+# Internal imports
 from resume.profiles.models import Profile
 
 
 class IsUserProfileOrAdmin(permissions.BasePermission):
-
     def has_permission(self, request, view):
         profile = get_object_or_404(Profile, uuid=view.kwargs.get('uuid'))
 

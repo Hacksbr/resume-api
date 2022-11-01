@@ -1,11 +1,10 @@
-from django.contrib.auth import get_user_model
-
+# Pip imports
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
+# Internal imports
+from resume.users.models import User
 from resume.users.serializers import UserSerializer
-
-User = get_user_model()
 
 
 class UserViewSet(viewsets.ModelViewSet):

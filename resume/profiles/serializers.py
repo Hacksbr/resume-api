@@ -1,8 +1,10 @@
+# Pip imports
 from rest_framework import serializers
 
+# Internal imports
+from resume.profiles.models import Profile, SocialLink
 from resume.users.models import User
 from resume.users.serializers import UserSerializer, UserUpdateSerializer
-from resume.profiles.models import Profile, SocialLink
 
 
 def update_attr(instance, data, attributes):
@@ -10,7 +12,6 @@ def update_attr(instance, data, attributes):
 
 
 class SocialLinkSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = SocialLink
         fields = (
@@ -21,7 +22,6 @@ class SocialLinkSerializer(serializers.ModelSerializer):
 
 
 class SocialLinkUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = SocialLink
         fields = (
@@ -84,9 +84,7 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**user_data)
         profile = Profile.objects.create(user=user, **validated_data)
 
-        SocialLink.objects.bulk_create(
-            [SocialLink(profile=profile, **item) for item in social_link_data]
-        )
+        SocialLink.objects.bulk_create([SocialLink(profile=profile, **item) for item in social_link_data])
 
         return profile
 
@@ -127,11 +125,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             social_link, created = SocialLink.objects.get_or_create(
                 id=item.get('id'),
                 profile_id=instance.id,
-                defaults={
-                    'name': item.get('name'),
-                    'link': item.get('link'),
-                    'is_active': item.get('is_active')
-                }
+                defaults={'name': item.get('name'), 'link': item.get('link'), 'is_active': item.get('is_active')},
             )
 
             if not created:

@@ -1,5 +1,7 @@
+# Pip imports
 from django.contrib import admin
 
+# Internal imports
 from resume.profiles.models import Profile, SocialLink
 
 
