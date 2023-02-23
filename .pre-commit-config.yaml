@@ -27,8 +27,6 @@ repos:
         description: "Black: The uncompromising Python code formatter"
         require_serial: true
         types: [ python ]
-        args:
-          - --config=pyproject.toml
 
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.9.2
@@ -57,3 +55,19 @@ repos:
         language: system
         pass_filenames: false
         files: ^(pyproject\.toml|poetry\.lock)$
+
+      - id: poetry-export
+        name: poetry export (local)
+        description: Export requirements during transition period
+        entry: poetry export -f requirements.txt --output requirements.txt --without-hashes
+        language: system
+        pass_filenames: false
+        files: ^(pyproject\.toml|poetry\.lock|(constraints|requirements)\.txt)$
+
+      - id: poetry-export-dev
+        name: poetry export dev (local)
+        description: Export dev requirements during transition period
+        entry: poetry export -f requirements.txt --without-hashes --dev --output requirements-dev.txt
+        language: system
+        pass_filenames: false
+        files: ^(pyproject\.toml|poetry\.lock|(constraints|requirements(-dev)?)\.txt)$
