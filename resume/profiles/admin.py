@@ -1,16 +1,48 @@
 # Pip imports
+from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from django.contrib import admin
+from django.forms import ModelForm, ModelMultipleChoiceField, SelectMultiple
 
 # Internal imports
 from resume.profiles.models import Profile, SocialLink
+from resume.roles.models import Role
+from resume.skills.models import Skill
+
+
+class SocialLinkInline(admin.TabularInline):
+    model = SocialLink
+    extra = 1
+
+
+class RoleInline(admin.TabularInline):
+    model = Role
+    extra = 1
+
+
+class ProfileSkillInline(SortableStackedInline, admin.TabularInline):
+    model = Profile.skills.through
+    extra = 1
+
+
+class ProfileAdminForm(ModelForm):
+    skills = ModelMultipleChoiceField(
+        queryset=Skill.objects.all(),
+        widget=SelectMultiple(attrs={'size': 10}),
+    )
+
+    class Meta:
+        model = Profile
+        fields = '__all__'
 
 
 @admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
+class ProfileAdmin(SortableAdminBase, admin.ModelAdmin):
+    form = ProfileAdminForm
     list_display = ('id', 'user__name', 'occupation', 'contact_email', 'phone', 'profile__location', 'created_at')
     list_display_links = ('id', 'user__name', 'occupation', 'contact_email', 'phone')
     list_filter = ('occupation', 'city', 'country', 'created_at', 'updated_at')
     search_fields = ('user__name', 'occupation', 'contact_email', 'city', 'country')
+    inlines = [SocialLinkInline, RoleInline, ProfileSkillInline]
 
     def user__name(self, obj):
         if obj.user:

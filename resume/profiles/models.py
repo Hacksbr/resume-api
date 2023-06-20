@@ -1,10 +1,10 @@
-# Python imports
-import uuid
-
 # Pip imports
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+# Internal imports
+from resume.core.models import ModelBase
 
 
 SOCIAL_NETWORKS = (
@@ -16,12 +16,9 @@ SOCIAL_NETWORKS = (
 )
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(
-        'users.User', verbose_name='User', related_name='user_profile', on_delete=models.CASCADE
-    )
+class Profile(ModelBase):
+    user = models.OneToOneField('users.User', verbose_name='User', related_name='profile', on_delete=models.CASCADE)
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     occupation = models.CharField(_('Occupation'), max_length=100, blank=False, null=False)
     contact_email = models.EmailField(_('Contact Email'), max_length=255, blank=True, null=True)
     phone = models.CharField(
@@ -38,8 +35,7 @@ class Profile(models.Model):
     country = models.CharField(_('Country'), max_length=80, blank=False, null=False)
     about = models.CharField(_('About'), max_length=550, blank=True, null=True)
 
-    created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('Updated at'), auto_now=True)
+    skills = models.ManyToManyField('skills.Skill', related_name='profile', blank=True, through='ProfileSkill')
 
     def __str__(self):
         return f'{self.user.get_full_name}'
@@ -53,7 +49,7 @@ class Profile(models.Model):
         verbose_name_plural = _('Profiles')
 
 
-class SocialLink(models.Model):
+class SocialLink(ModelBase):
     class SocialNetworks(models.TextChoices):
         GITHUB = 'github', _('GitHub')
         LINKEDIN = 'linkedin', _('LinkedIn')
@@ -69,9 +65,6 @@ class SocialLink(models.Model):
     link = models.CharField(_('Link'), max_length=255, blank=False, null=False)
     is_active = models.BooleanField(_('Active'), default=True)
 
-    created_at = models.DateTimeField('Created at', auto_now_add=True)
-    updated_at = models.DateTimeField('Updated at', auto_now=True)
-
     def __str__(self):
         return self.name
 
@@ -82,3 +75,21 @@ class SocialLink(models.Model):
     class Meta:
         verbose_name = _('Social Link')
         verbose_name_plural = _('Social Links')
+
+
+class ProfileSkill(ModelBase):
+    profile = models.ForeignKey(
+        'Profile', verbose_name='Profile', related_name='profile_skills', on_delete=models.CASCADE
+    )
+    skill = models.ForeignKey(
+        'skills.Skill', verbose_name='Skill', related_name='profile_skills', on_delete=models.CASCADE
+    )
+    order = models.PositiveIntegerField(default=0, blank=False, null=False, db_index=True)
+
+    def __str__(self):
+        return f'{self.profile} - {self.skill}'
+
+    class Meta:
+        verbose_name = _('Profile Skill')
+        verbose_name_plural = _('Profile Skills')
+        ordering = ['order']

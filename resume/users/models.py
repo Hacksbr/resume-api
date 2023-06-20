@@ -1,3 +1,6 @@
+# Python imports
+import uuid
+
 # Pip imports
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
@@ -12,6 +15,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     """
     Change the default User Model beahavier to login with 'email'.
     """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     email = models.EmailField(_('email address'), max_length=255, unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)

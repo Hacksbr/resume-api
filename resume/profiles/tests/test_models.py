@@ -36,9 +36,8 @@ class ProfilesModelTestCase(TestCase):
 
     def test_create_profile_with_about(self) -> None:
         """
-        Validate that a profile is being created correctly with about field.
+        Validate that a profile is being created correctly with 'about' field.
         """
-
         about = """Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
         the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and
         scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into
@@ -57,7 +56,7 @@ class ProfilesModelTestCase(TestCase):
 
     def test_create_profile_with_more_characters_than_the_limit(self) -> None:
         """
-        Validate that a profile is not being created with the about field longer than 550 characters.
+        Validate that a profile is not being created with the 'about' field longer than 550 characters.
         """
         about_with_550_char = 'a' * 550
         profile = ProfileFactory.create(about=about_with_550_char)
