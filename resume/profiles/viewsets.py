@@ -1,5 +1,6 @@
 # Pip imports
 from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 # Internal imports
@@ -10,7 +11,6 @@ from resume.profiles.permissions import IsUserProfileOrAdmin
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
-    lookup_field = 'uuid'
     permission_classes = []
 
     def create(self, request, *args, **kwargs):
@@ -44,6 +44,12 @@ class ProfileViewSet(viewsets.ModelViewSet):
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(detail=False, methods=['get'])
+    def me(self, request, *args, **kwargs):
+        instance = request.user.profile
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
     def get_serializer_class(self):
         if self.action == 'create':
             return serializers.ProfileCreateSerializer
@@ -59,5 +65,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
         if self.action in ['update', 'partial_update', 'destroy']:
             self.permission_classes = (permissions.IsAuthenticated, IsUserProfileOrAdmin)
+
+        if self.action in ['me']:
+            self.permission_classes = (permissions.IsAuthenticated,)
 
         return super().get_permissions()

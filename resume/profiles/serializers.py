@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 # Internal imports
 from resume.profiles.models import Profile, SocialLink
+from resume.roles.serializers import RoleSerializer
+from resume.skills.serializers import SkillSerializer
 from resume.users.models import User
 from resume.users.serializers import UserSerializer, UserUpdateSerializer
 
@@ -37,6 +39,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
     social_links = SocialLinkSerializer(many=True)
+    roles = RoleSerializer(many=True)
+    skills = SkillSerializer(many=True)
 
     def get_name(self, obj):  # noqa
         return str(obj)
@@ -46,9 +50,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        lookup_field = 'uuid'
         fields = (
-            'uuid',
             'name',
             'occupation',
             'contact_email',
@@ -56,8 +58,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             'phone',
             'about',
             'social_links',
+            'skills',
+            'roles',
         )
-        read_only_fields = ('uuid',)
 
 
 class ProfileCreateSerializer(serializers.ModelSerializer):
@@ -66,7 +69,6 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        lookup_field = 'uuid'
         fields = (
             'user',
             'occupation',
@@ -97,7 +99,6 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        lookup_field = 'uuid'
         fields = (
             'user',
             'occupation',
