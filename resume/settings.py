@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     # my apps
     'resume.core',
     'resume.users',
-    'resume.profiles'
+    'resume.skills',
 ]
 
 MIDDLEWARE = [
