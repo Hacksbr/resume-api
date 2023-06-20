@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     # my apps
     'resume.core',
     'resume.users',
+    'resume.profiles',
+    'resume.roles',
     'resume.skills',
 ]
 
@@ -72,11 +74,9 @@ DATABASES = {
 }
 
 # Auto-created primary keys
-
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Password validation
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
