@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'adminsortable2',
     # my apps
+    'resume.core',
     'resume.users',
     'resume.profiles'
 ]
