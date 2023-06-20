@@ -28,9 +28,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_extensions',
+    'adminsortable2',
     # my apps
+    'resume.core',
     'resume.users',
-    'resume.profiles'
+    'resume.skills',
 ]
 
 MIDDLEWARE = [
