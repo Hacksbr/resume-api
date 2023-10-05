@@ -3,7 +3,7 @@ from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from django.contrib import admin
 
 # Internal imports
-from resume.education.models import Education, EducationSkill, Language
+from resume.education.models import Education, EducationSkill
 
 
 class EducationSkillInline(SortableStackedInline, admin.TabularInline):
@@ -20,13 +20,3 @@ class EducationAdmin(SortableAdminBase, admin.ModelAdmin):
     ordering = ('-end_date', '-start_date')
     readonly_fields = ('created_at', 'updated_at')
     inlines = [EducationSkillInline]
-
-
-@admin.register(Language)
-class LanguageAdmin(admin.ModelAdmin):
-    list_display = ('name', 'level')
-    list_display_links = ('name', 'level')
-    list_filter = ('name', 'level')
-    search_fields = ('name', 'level')
-    ordering = ('name',)
-    readonly_fields = ('created_at', 'updated_at')

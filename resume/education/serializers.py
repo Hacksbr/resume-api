@@ -2,7 +2,7 @@
 from rest_framework import serializers
 
 # Internal imports
-from resume.education.models import Education, Language
+from resume.education.models import Education
 
 
 class EducationSerializer(serializers.ModelSerializer):
@@ -23,13 +23,3 @@ class EducationSerializer(serializers.ModelSerializer):
             'country',
             'skills',
         )
-
-
-class LanguageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Language
-        fields = (
-            'name',
-            'level',
-        )
-        extra_kwargs = {'level': {'choices': Language.LanguageLevels.choices}}

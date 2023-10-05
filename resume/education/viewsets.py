@@ -2,17 +2,11 @@
 from rest_framework import viewsets
 
 # Internal imports
-from resume.education.models import Education, Language
-from resume.education.serializers import EducationSerializer, LanguageSerializer
+from resume.education.models import Education
+from resume.education.serializers import EducationSerializer
 
 
 class EducationViewSet(viewsets.ModelViewSet):
     queryset = Education.objects.all()
     serializer_class = EducationSerializer
-    permission_classes = []
-
-
-class LanguageViewSet(viewsets.ModelViewSet):
-    queryset = Language.objects.all()
-    serializer_class = LanguageSerializer
     permission_classes = []
