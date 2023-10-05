@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.forms import ModelForm, ModelMultipleChoiceField, SelectMultiple
 
 # Internal imports
+from resume.education.models import Education
 from resume.profiles.models import Profile, SocialLink
 from resume.roles.models import Role
 from resume.skills.models import Skill
@@ -16,6 +17,11 @@ class SocialLinkInline(admin.TabularInline):
 
 class RoleInline(admin.TabularInline):
     model = Role
+    extra = 1
+
+
+class EducationInline(admin.TabularInline):
+    model = Education
     extra = 1
 
 
@@ -42,7 +48,12 @@ class ProfileAdmin(SortableAdminBase, admin.ModelAdmin):
     list_display_links = ('id', 'user__name', 'occupation', 'contact_email', 'phone')
     list_filter = ('occupation', 'city', 'country', 'created_at', 'updated_at')
     search_fields = ('user__name', 'occupation', 'contact_email', 'city', 'country')
-    inlines = [SocialLinkInline, RoleInline, ProfileSkillInline]
+    inlines = (
+        SocialLinkInline,
+        RoleInline,
+        EducationInline,
+        ProfileSkillInline,
+    )
 
     def user__name(self, obj):
         if obj.user:
