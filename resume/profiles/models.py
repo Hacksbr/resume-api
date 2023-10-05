@@ -17,7 +17,7 @@ SOCIAL_NETWORKS = (
 
 
 class Profile(ModelBase):
-    user = models.OneToOneField('users.User', verbose_name='User', related_name='profile', on_delete=models.CASCADE)
+    user = models.OneToOneField('users.User', verbose_name=_('User'), related_name='profile', on_delete=models.CASCADE)
 
     occupation = models.CharField(_('Occupation'), max_length=100, blank=False, null=False)
     contact_email = models.EmailField(_('Contact Email'), max_length=255, blank=True, null=True)
@@ -32,17 +32,20 @@ class Profile(ModelBase):
         ],
     )
     city = models.CharField(_('City'), max_length=100, blank=False, null=False)
+    uf = models.CharField(_('UF'), max_length=2)
     country = models.CharField(_('Country'), max_length=80, blank=False, null=False)
     about = models.CharField(_('About'), max_length=550, blank=True, null=True)
 
-    skills = models.ManyToManyField('skills.Skill', related_name='profile', blank=True, through='ProfileSkill')
+    skills = models.ManyToManyField(
+        'skills.Skill', verbose_name=_('Skills'), related_name='profile', blank=True, through='ProfileSkill'
+    )
 
     def __str__(self):
         return f'{self.user.get_full_name}'
 
     @property
     def get_location(self):
-        return f'{self.city}, {self.country}'
+        return f'{self.city}, {self.uf}, {self.country}'
 
     class Meta:
         verbose_name = _('Profile')
@@ -58,7 +61,7 @@ class SocialLink(ModelBase):
         OTHER = 'other', _('Other')
 
     profile = models.ForeignKey(
-        'Profile', verbose_name='Profile', related_name='social_links', on_delete=models.CASCADE
+        'Profile', verbose_name=_('Profile'), related_name='social_links', on_delete=models.CASCADE
     )
 
     name = models.CharField(_('Name'), max_length=8, choices=SocialNetworks.choices, blank=False, null=False)
@@ -79,12 +82,12 @@ class SocialLink(ModelBase):
 
 class ProfileSkill(ModelBase):
     profile = models.ForeignKey(
-        'Profile', verbose_name='Profile', related_name='profile_skills', on_delete=models.CASCADE
+        'Profile', verbose_name=_('Profile'), related_name='profile_skills', on_delete=models.CASCADE
     )
     skill = models.ForeignKey(
-        'skills.Skill', verbose_name='Skill', related_name='profile_skills', on_delete=models.CASCADE
+        'skills.Skill', verbose_name=_('Skill'), related_name='profile_skills', on_delete=models.CASCADE
     )
-    order = models.PositiveIntegerField(default=0, blank=False, null=False, db_index=True)
+    order = models.PositiveIntegerField(_('Order'), default=0, blank=False, null=False, db_index=True)
 
     def __str__(self):
         return f'{self.profile} - {self.skill}'

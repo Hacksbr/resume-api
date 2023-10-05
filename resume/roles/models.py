@@ -20,26 +20,30 @@ class Role(ModelBase):
         VOLUNTEER = 'volunteer', _('Volunteer')
         OTHER = 'other', _('Other')
 
-    company = models.CharField(max_length=50)
-    title = models.CharField(max_length=50)
-    employment_type = models.CharField(max_length=50, choices=EmploymentTypes.choices, blank=True, null=True)
-    about = models.CharField(max_length=125, blank=True, null=True)
+    company = models.CharField(_('Company'), max_length=50)
+    title = models.CharField(_('Title'), max_length=50)
+    employment_type = models.CharField(
+        _('Employment Type'), max_length=50, choices=EmploymentTypes.choices, blank=True, null=True
+    )
+    about = models.CharField(_('About'), max_length=125, blank=True, null=True)
 
-    start_date = models.DateField()
-    end_date = models.DateField(blank=True, null=True)
+    start_date = models.DateField(_('Start Date'))
+    end_date = models.DateField(_('End Date'), blank=True, null=True)
 
-    city = models.CharField(max_length=50)
-    uf = models.CharField(max_length=2)
-    country = models.CharField(max_length=50)
+    city = models.CharField(_('City'), max_length=50)
+    uf = models.CharField(_('UF'), max_length=2)
+    country = models.CharField(_('Country'), max_length=50)
 
-    is_current = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    is_current = models.BooleanField(_('Is Current'), default=False)
+    is_active = models.BooleanField(_('Is Active'), default=True)
 
     profile = models.ForeignKey(
-        'profiles.Profile', verbose_name='Profile', related_name='roles', on_delete=models.CASCADE
+        'profiles.Profile', verbose_name=_('Profile'), related_name='roles', on_delete=models.CASCADE
     )
 
-    skills = models.ManyToManyField('skills.Skill', related_name='role', blank=True, through='RoleSkill')
+    skills = models.ManyToManyField(
+        'skills.Skill', verbose_name=_('Skills'), related_name='role', blank=True, through='RoleSkill'
+    )
 
     def __str__(self):
         return f'{self.title} at {self.company}'
@@ -51,10 +55,10 @@ class Role(ModelBase):
 
 
 class Achievement(ModelBase):
-    description = models.CharField(max_length=125)
-    order = models.PositiveIntegerField(default=0, blank=False, null=False, db_index=True)
+    description = models.CharField(_('Description'), max_length=125)
+    order = models.PositiveIntegerField(_('Order'), default=0, blank=False, null=False, db_index=True)
 
-    role = models.ForeignKey('Role', verbose_name='Role', related_name='achievements', on_delete=models.CASCADE)
+    role = models.ForeignKey('Role', verbose_name=_('Role'), related_name='achievements', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.description
@@ -66,11 +70,11 @@ class Achievement(ModelBase):
 
 
 class RoleSkill(ModelBase):
-    role = models.ForeignKey('Role', verbose_name='Role', related_name='role_skills', on_delete=models.CASCADE)
+    role = models.ForeignKey('Role', verbose_name=_('Role'), related_name='role_skills', on_delete=models.CASCADE)
     skill = models.ForeignKey(
-        'skills.Skill', verbose_name='Skill', related_name='role_skills', on_delete=models.CASCADE
+        'skills.Skill', verbose_name=_('Skill'), related_name='role_skills', on_delete=models.CASCADE
     )
-    order = models.PositiveIntegerField(default=0, blank=False, null=False, db_index=True)
+    order = models.PositiveIntegerField(_('Order'), default=0, blank=False, null=False, db_index=True)
 
     def __str__(self):
         return f'{self.role} - {self.skill}'
