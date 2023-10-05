@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.forms import ModelForm, ModelMultipleChoiceField, SelectMultiple
 
 # Internal imports
-from resume.education.models import Education
+from resume.education.models import Education, Language
 from resume.profiles.models import Profile, SocialLink
 from resume.roles.models import Role
 from resume.skills.models import Skill
@@ -22,6 +22,11 @@ class RoleInline(admin.TabularInline):
 
 class EducationInline(admin.TabularInline):
     model = Education
+    extra = 1
+
+
+class LanguageInline(admin.TabularInline):
+    model = Language
     extra = 1
 
 
@@ -52,6 +57,7 @@ class ProfileAdmin(SortableAdminBase, admin.ModelAdmin):
         SocialLinkInline,
         RoleInline,
         EducationInline,
+        LanguageInline,
         ProfileSkillInline,
     )
 
