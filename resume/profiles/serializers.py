@@ -2,6 +2,7 @@
 from rest_framework import serializers
 
 # Internal imports
+from resume.education.serializers import EducationSerializer
 from resume.profiles.models import Profile, SocialLink
 from resume.roles.serializers import RoleSerializer
 from resume.skills.serializers import SkillSerializer
@@ -40,6 +41,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     location = serializers.SerializerMethodField()
     social_links = SocialLinkSerializer(many=True)
     roles = RoleSerializer(many=True)
+    education = EducationSerializer(many=True)
     skills = SkillSerializer(many=True)
 
     def get_name(self, obj):  # noqa
@@ -58,8 +60,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             'phone',
             'about',
             'social_links',
-            'skills',
             'roles',
+            'education',
+            'skills',
         )
 
 
