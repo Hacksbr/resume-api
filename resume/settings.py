@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'resume.users',
     'resume.profiles',
     'resume.roles',
+    'resume.education',
     'resume.skills',
 ]
 
