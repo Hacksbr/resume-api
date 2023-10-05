@@ -7,10 +7,10 @@ from resume.core.models import ModelBase
 
 
 class Skill(ModelBase):
-    name = models.CharField(max_length=50)
-    category = models.CharField(max_length=50)
-    type = models.CharField(max_length=50)
-    language = models.CharField(max_length=50)
+    name = models.CharField(_('Name'), max_length=50)
+    category = models.CharField(_('Category'), max_length=50)
+    type = models.CharField(_('Type'), max_length=50)
+    language = models.CharField(_('Language'), max_length=50)
 
     def __str__(self):
         return self.name
